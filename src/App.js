@@ -10,6 +10,7 @@ import theme from './Theme'
 
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import { ConsoleWriter } from 'istanbul-lib-report';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -38,7 +39,9 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 
-var storage = firebase.storage()
+const storage = firebase.storage()
+const auth = firebase.auth()
+const db = firebase.firestore()
 
 function App() {
 
@@ -47,9 +50,59 @@ function App() {
 
 
   const handleDatabase = () =>{
-     console.log('hi')
+    const ref = db.collection('User')
+    ref.get().then(querySnapshot=>{
+      querySnapshot.forEach(doc => {
+        console.log(doc.id, doc.data());
+      });
+    })
   }
 
+  const createAccount = () => {
+      auth.createUserWithEmailAndPassword('paul@gmail.com', '12345678').then(x=>{
+        console.log(x)
+      }).catch(y=>{
+        console.log(y)
+      })
+  }
+
+  const updateAccount = () =>{
+    const user = firebase.auth().currentUser
+    const displayName = user.displayName
+		const email = user.email
+		const emailVerified = user.emailVerified
+		const photoURL = user.photoURL
+    //firebase 可支援的參數有displayName、email、emailVerified、photoURL
+  
+    var profile = {displayName,email,emailVerified,photoURL}
+    const result = user.updateProfile(profile).then(function() {
+      //將修改資料傳回firebase
+      return user.updateProfile({'displayName': "paul", 'phoneNumber':'0988895303'});
+    }).catch(function(error) {
+      //修改資料未成功的錯誤訊息
+      var errorMessage = error.message;
+      console.log('profile error',errorMessage)
+    });
+
+  }
+
+  const loginAccount = () =>{
+      const email = 'paul@gmail.com'
+      const password = '12345678'
+      auth.signInWithEmailAndPassword(email, password).then(function(user) {
+        //登入成功
+        console.log('login success');
+      }).catch(function(error) {
+        //登入錯誤訊息
+        var errorMessage = error.message;
+        console.log(errorMessage);
+      });
+  }
+
+  const getCurrentUser = () =>{
+      const user = auth.currentUser;
+      console.log(user)
+  }
   const handleUploadClick = (event) =>{
     const file = event.target.files[0]
     var storageRef = storage.ref(file.name);
@@ -76,7 +129,7 @@ function App() {
     const pathReference = storage.ref(fileName);
     pathReference.getDownloadURL().then( url => {
 
-        /*
+        
         console.log(url)
         var element = document.createElement('a');
         element.href = url
@@ -85,7 +138,7 @@ function App() {
         element.download=fileName
         //onClick property 
         element.click(); 
-        */
+        
 
         /*
         var xhr = new XMLHttpRequest();
@@ -99,24 +152,32 @@ function App() {
     })
   }
 
-  console.log(fileList)
-
   return (
     <ThemeProvider theme={theme}>
       <Grid container spacing={4} justify='center' alignItems='center' className={classes.mainContainer}>
         <Grid item>
-          <Button onClick={()=>handleDatabase()} variant="contained" color="secondary">
+          <Button onClick={()=>createAccount()} variant="contained" color="secondary">
             Auth
           </Button>
         </Grid>
         <Grid item>
-          <Button onClick={()=>handleDatabase()} variant="contained" color="secondary">
-            Database
+          <Button onClick={()=>updateAccount()} variant="contained" color="secondary">
+            Update Auth
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button onClick={()=>loginAccount()} variant="contained" color="secondary">
+            Login
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button onClick={()=>getCurrentUser()} variant="contained" color="secondary">
+            Current User
           </Button>
         </Grid>
         <Grid item>
           <Button onClick={()=>handleDatabase()} variant="contained" color="secondary">
-            Store
+            Database Show Data
           </Button>
         </Grid>
         <Grid item>
