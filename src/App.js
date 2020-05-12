@@ -13,14 +13,11 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField'
+import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 
 const useStyles = makeStyles((theme) => ({
   mainContainer:{
-    width:'100',
-    height:'200px'
-  },
-  fileContainer:{
-    width:'100',
+    width:'100%',
     height:'200px'
   },
   infoCotainer:{
@@ -49,6 +46,10 @@ const useStyles = makeStyles((theme) => ({
     background: '#007979 0% 0% no-repeat padding-box',
     opacity: 1
   },
+  file:{
+    backgroundColor:'#009393',
+    color:'#FFFFFF'
+  }
 }));
 
 // TODO: Replace the following with your app's Firebase project configuration
@@ -81,16 +82,15 @@ function App() {
 
   const handleDatabase = () =>{
     const ref = db.collection('User')
-    let dbInfomation = []
+    const info = []
     ref.get().then(querySnapshot=>{
-      console.log(querySnapshot)
       querySnapshot.forEach(doc => {
-        console.log(doc.data())
-        dbInfomation.push(doc.data())
+        info.push(doc.data())
+        
       });
+      setDbInfo(info)
     })
-    console.log(dbInfomation)
-    setDbInfo(dbInfomation)
+    
   }
 
   const changeAccount = (e) =>{
@@ -193,67 +193,11 @@ function App() {
         element.download=fileName
         //onClick property 
         element.click(); 
-        
-
-        /*
-        var xhr = new XMLHttpRequest();
-        xhr.responseType = 'blob';
-        xhr.onload = function(event) {
-          var blob = xhr.response;
-        };
-        xhr.open('GET', url);
-        xhr.send();
-        */
     })
   }
 
-  console.log(dbInfo)
   return (
     <ThemeProvider theme={theme}>
-      <Grid container spacing={4} justify='center' alignItems='center' className={classes.mainContainer}>
-        
-        <Grid item>
-          <Button onClick={()=>handleDatabase()} variant="contained" color="secondary">
-            Database Show Data
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button
-
-            variant="contained"
-            component="label"
-            color="primary"
-          >
-            Upload File
-            <input
-              multiple
-              type="file"
-              style={{ display: "none" }}
-              onChange={handleUploadClick}
-            />
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button onClick={()=>listStorageFile()} variant="contained" color="primary">
-            List Storage File
-          </Button>
-        </Grid>
-      </Grid>
-      <Grid container spacing={2} justify='center' alignItems='center' className={classes.fileContainer}>
-        {fileList.map(x=>{
-          console.log(x)
-          return(
-            <Grid item key={x}>
-              <Button onClick={()=>downloadFile(x)} variant="contained" >
-                 {x}
-              </Button>
-            </Grid>
-          )
-
-        })}
-
-      </Grid>
-
       <Grid container spacing={2} className={classes.mainContainer}>
           <Grid item container lg={6}>
             <Grid item container justify='space-between' style={{width:'95%',marginTop:'17px'}} >
@@ -312,7 +256,7 @@ function App() {
             </Grid>
           </Grid>
           <Grid item container lg={6}>
-          <Grid item container justify='space-between' style={{width:'95%',marginTop:'17px'}} >
+            <Grid item container justify='space-between' style={{width:'95%',marginTop:'17px'}} >
               <Grid item lg md sm xs={12}>
                   <Grid container direction='column' alignItems='center' className={classes.infoCotainer}>
                       <Grid item container justify='space-between' style={{marginTop:'20px',width:'95%'}}>
@@ -336,11 +280,12 @@ function App() {
                       </Grid>
                       <Grid item container direction='row' style={{ marginTop:'20px'}}>
                            {dbInfo.length >0 ? 
-                            dbInfo.map(x=>{
-                              return (
-                                <Typography style={{color:'white'}} className={classes.smWord}>{x.name}</Typography>
-                              )
-                            })
+                              dbInfo.map(x=>{
+                                return(
+                                <Typography key={x} style={{color:'#A2A6BB'}} className={classes.smWord}> {JSON.stringify(x)}</Typography>
+                                )
+                              })
+                              
                            :''
                            }
                       </Grid>
@@ -349,9 +294,63 @@ function App() {
             </Grid>
           </Grid>
           <Grid item container lg={6}>
-            
+            <Grid item container justify='space-between' style={{width:'95%',marginTop:'17px'}} >
+                <Grid item lg md sm xs={12}>
+                    <Grid container direction='column' alignItems='center' className={classes.infoCotainer}>
+                        <Grid item container justify='space-between' style={{marginTop:'20px',width:'95%'}}>
+                            <Grid item >
+                                <Typography className={classes.mdWord}>Firebase Storage</Typography>
+                            </Grid>
+                            <Grid item >
+                                <Typography style={{color:'#A2A6BB'}} className={classes.smWord}>| 更多訊息</Typography>
+                            </Grid>
+                        </Grid>
+                        <Grid item style={{width:'95%',marginTop:'15px'}}>
+                            <Divider className={classes.commonDivider}/>  
+                        </Grid>
+
+                        <Grid item container direction='row' style={{width:'95%',marginTop:'10px'}} spacing={4}>
+                          <Grid item>
+                            <Button
+                              variant="contained"
+                              component="label"
+                              color="primary"
+                            >
+                              Upload File
+                              <input
+                                multiple
+                                type="file"
+                                style={{ display: "none" }}
+                                onChange={handleUploadClick}
+                              />
+                            </Button>
+                          </Grid>
+                          <Grid item>
+                            <Button onClick={()=>listStorageFile()} variant="contained" color="primary">
+                              List Storage File
+                            </Button>
+                          </Grid>
+                        </Grid>
+                        <Grid item container spacing={2} direction='row' style={{width:'95%',marginTop:'10px'}} >
+
+                            {fileList.map(x=>{
+                              console.log(x)
+                              return(
+                                <Grid item key={x} lg={3}>
+                                  <Button startIcon={<InsertDriveFileIcon />} onClick={()=>downloadFile(x)} className={classes.file}variant="contained" >
+                                    {x}
+                                  </Button>
+                                </Grid>
+                              )
+
+                            })}
+                        </Grid>
+                    </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
           </Grid>
-      </Grid>
+      
       
 
     </ThemeProvider>
