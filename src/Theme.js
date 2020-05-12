@@ -7,13 +7,13 @@ const arcGrey = '#866666'
 export default  createMuiTheme({
     palette: {
         common:{
-            
+            main:arcBlue
         },
         primary:{
-           
+            main:arcBlue
         },
         secondary:{
-          
+            main:arcBlue
         }
     },
     typography:{
