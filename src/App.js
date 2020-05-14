@@ -80,6 +80,9 @@ function App() {
   const [name,setName] = useState('')
   const [dbInfo,setDbInfo] = useState([])
 
+  const [dbData,setDbData] = useState({})
+  const [dbDocName,setDbDocName] = useState('')
+
   const handleDatabase = () =>{
     const ref = db.collection('User')
     const info = []
@@ -91,6 +94,39 @@ function App() {
       setDbInfo(info)
     })
     
+  }
+
+  const insertOrmodifyDB = () =>{
+      if(!dbDocName){
+        alert('Doc name must have value !')
+        return false
+      }
+
+      if(!dbData){
+        alert('Data must have value !')
+        return false
+      }
+      db.collection("User").doc(dbDocName).set(JSON.parse(dbData)).then(x=>{
+          alert("Insert/Updata data successfully!")
+      }).catch(function(error) {
+        // The document probably doesn't exist.
+        console.error("Error updating document: ", error);
+    });
+      
+  }
+
+  const dbDataChange = (e) =>{
+    const data = e.target.value
+    if(data){
+      setDbData(data)
+    }
+  }
+
+  const dbDocNameChange = (e) =>{
+    const name = e.target.value
+    if(name){
+      setDbDocName(name)
+    }
   }
 
   const changeAccount = (e) =>{
@@ -276,6 +312,26 @@ function App() {
                             <Button onClick={()=>handleDatabase()} variant="contained" color="secondary">
                               Database Show Data
                             </Button>
+                          </Grid>
+                          <Grid item  style={{marginLeft:'40px'}}>
+                              <Button onClick={()=>insertOrmodifyDB()} variant="contained" color="secondary">
+                                新增/修改 Data
+                              </Button>
+                          </Grid>
+                          <Grid item container direction='column'>
+                            <Grid item>
+                              <Typography className={classes.smWord}>輸入</Typography>
+                            </Grid>
+                            <Grid item>
+                              <TextField className={classes.inputText} onChange={(e)=>dbDataChange(e)} variant="outlined" />
+                            </Grid>
+                            <Grid item>
+                              <Typography className={classes.smWord}>Doc Name</Typography>
+                            </Grid>
+                            <Grid item>
+                              <TextField className={classes.inputText} onChange={(e)=>dbDocNameChange(e)} variant="outlined" />
+                            </Grid>
+
                           </Grid>
                       </Grid>
                       <Grid item container direction='row' style={{ marginTop:'20px'}}>
